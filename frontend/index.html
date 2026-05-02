@@ -3,515 +3,793 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Index Signal Analyser — FTSE / DJIA / Nasdaq</title>
+<title>Index Signal Analyser</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{--bg:#fff;--bg2:#f5f5f3;--text:#1a1a18;--t2:#6b6b68;--t3:#aaa;--bd:rgba(0,0,0,0.09);--blue:#185FA5;--bl:#E6F1FB;--green:#2E6B0F;--gl:#EAF3DE;--red:#A32D2D;--rl:#FCEBEB;--amber:#7A4800;--al:#FEF0D6;--purple:#4A3FAF;--pl:#EEEDFE;--r:8px;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text);font-size:13px;padding:14px;max-width:1000px;}
-h1{font-size:17px;font-weight:700;margin-bottom:2px;}
-.sub{font-size:11px;color:var(--t2);margin-bottom:14px;}
-.card{background:var(--bg);border:.5px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.stitle{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:5px;border-bottom:.5px solid var(--bd);}
-.btn{font-size:12px;padding:5px 14px;border:.5px solid rgba(0,0,0,0.18);border-radius:var(--r);background:var(--bg);color:var(--text);cursor:pointer;margin-right:5px;margin-bottom:4px;}
-.btn:hover{background:var(--bg2);}
-.bp{background:var(--text)!important;color:var(--bg)!important;border-color:var(--text)!important;}
-select,input[type=number],input[type=text]{font-size:12px;padding:4px 7px;border:.5px solid rgba(0,0,0,0.18);border-radius:var(--r);background:var(--bg);color:var(--text);}
-.sbar{font-size:12px;padding:9px 13px;border-radius:var(--r);margin-bottom:10px;line-height:1.6;}
-.load{background:var(--bl);color:var(--blue);}
-.ok{background:var(--gl);color:var(--green);}
-.err{background:var(--rl);color:var(--red);}
-.warn{background:var(--al);color:var(--amber);}
-@keyframes spin{to{transform:rotate(360deg);}}
-.spin{display:inline-block;width:11px;height:11px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;}
-.metric{background:var(--bg2);border-radius:var(--r);padding:10px;text-align:center;}
-.ml{font-size:10px;color:var(--t2);margin-bottom:3px;}
-.mv{font-size:18px;font-weight:700;}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
-.sc{background:var(--bg2);border-radius:var(--r);padding:12px;}
-.ch{position:relative;width:100%;height:100px;margin-top:7px;}
-.trow{display:grid;gap:3px;padding:4px 0;border-bottom:.5px solid var(--bd);font-size:11px;align-items:center;}
-.trow:last-child{border:none;}
-.pill{display:inline-block;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;}
-.p-odd{background:var(--bl);color:var(--blue);}
-.p-even{background:var(--gl);color:var(--green);}
-.p-hi{background:var(--al);color:var(--amber);}
-.p-lo{background:var(--pl);color:var(--purple);}
-.win{color:var(--green);font-weight:700;}
-.loss{color:var(--red);font-weight:700;}
-.cbox{background:var(--bg2);border-radius:var(--r);padding:9px 13px;font-size:11px;color:var(--t2);margin-bottom:10px;line-height:1.9;}
-.tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;}
-.tab{font-size:12px;padding:5px 14px;border:.5px solid rgba(0,0,0,0.18);border-radius:var(--r);background:transparent;color:var(--t2);cursor:pointer;}
-.tab.active{background:var(--text);color:var(--bg);border-color:var(--text);}
-.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
-strong{font-weight:700;}
-.note{font-size:10px;color:var(--t3);margin-top:6px;font-style:italic;}
+:root {
+  --bg: #0f0f11;
+  --bg2: #17171a;
+  --bg3: #1e1e22;
+  --bg4: #252529;
+  --text: #f0f0ee;
+  --t2: #9999a0;
+  --t3: #55555c;
+  --bd: rgba(255,255,255,0.07);
+  --bd2: rgba(255,255,255,0.12);
+  --blue: #4f8ef7;
+  --blue-d: #1a3a7a;
+  --green: #34c97a;
+  --green-d: #0d3d22;
+  --red: #f75a5a;
+  --red-d: #3d0d0d;
+  --amber: #f7a834;
+  --amber-d: #3d2800;
+  --purple: #a78bfa;
+  --purple-d: #2d1a5a;
+  --r: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; min-height: 100vh; }
 
-/* Pattern finder styles */
-.bet-box{border-radius:var(--r);padding:16px;margin-bottom:12px;border:1.5px solid;}
-.bet-strong{background:#EAF3DE;border-color:#2E6B0F;}
-.bet-moderate{background:#FEF0D6;border-color:#7A4800;}
-.bet-weak{background:#EEEDFE;border-color:#4A3FAF;}
-.bet-label{font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
-.bet-signal{font-size:20px;font-weight:700;margin-bottom:4px;}
-.bet-reason{font-size:12px;color:var(--t2);line-height:1.6;}
-.pat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.pat-card{background:var(--bg2);border-radius:var(--r);padding:10px 12px;}
-.pat-title{font-size:10px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
-.pat-val{font-size:14px;font-weight:700;}
-.pat-sub{font-size:11px;color:var(--t2);margin-top:2px;}
-.dow-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;}
-.dow-cell{background:var(--bg2);border-radius:var(--r);padding:8px;text-align:center;}
-.dow-name{font-size:10px;color:var(--t2);margin-bottom:4px;}
-.dow-val{font-size:13px;font-weight:700;}
-.dow-sub{font-size:10px;color:var(--t2);}
-.streak-bar{display:flex;gap:2px;flex-wrap:wrap;margin:6px 0;}
-.streak-dot{width:12px;height:12px;border-radius:2px;display:inline-block;}
-.heatmap{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:6px 0;}
-.hm-cell{padding:5px 2px;border-radius:3px;text-align:center;font-size:10px;font-weight:700;}
+/* Layout */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { width: 200px; background: var(--bg2); border-right: .5px solid var(--bd); padding: 20px 0; flex-shrink: 0; position: fixed; height: 100vh; z-index: 10; }
+.main { margin-left: 200px; flex: 1; padding: 20px; max-width: calc(100% - 200px); }
+
+/* Sidebar */
+.brand { padding: 0 16px 20px; border-bottom: .5px solid var(--bd); margin-bottom: 12px; }
+.brand-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.brand-sub { font-size: 10px; color: var(--t2); margin-top: 2px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 9px 16px; font-size: 12px; color: var(--t2); cursor: pointer; border-left: 2px solid transparent; transition: all .15s; }
+.nav-item:hover { color: var(--text); background: var(--bg3); }
+.nav-item.active { color: var(--blue); border-left-color: var(--blue); background: rgba(79,142,247,0.08); font-weight: 600; }
+.nav-icon { font-size: 15px; }
+.nav-section { font-size: 9px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .08em; padding: 12px 16px 4px; }
+
+/* Cards */
+.card { background: var(--bg2); border: .5px solid var(--bd); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 11px; font-weight: 700; color: var(--t2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: .5px solid var(--bd); display: flex; align-items: center; justify-content: space-between; }
+
+/* Status bar */
+.sbar { font-size: 12px; padding: 10px 14px; border-radius: var(--r); margin-bottom: 14px; }
+.sbar.load { background: rgba(79,142,247,0.12); color: var(--blue); border: .5px solid var(--blue-d); }
+.sbar.ok { background: rgba(52,201,122,0.1); color: var(--green); border: .5px solid var(--green-d); }
+.sbar.err { background: rgba(247,90,90,0.1); color: var(--red); border: .5px solid var(--red-d); }
+.sbar.warn { background: rgba(247,168,52,0.1); color: var(--amber); border: .5px solid var(--amber-d); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { display: inline-block; width: 11px; height: 11px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 5px; }
+
+/* Buttons */
+.btn { font-size: 12px; padding: 6px 14px; border: .5px solid var(--bd2); border-radius: 6px; background: var(--bg3); color: var(--text); cursor: pointer; transition: all .15s; }
+.btn:hover { background: var(--bg4); }
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-primary:hover { opacity: .85; }
+.btn-green { background: var(--green); color: #000; border-color: var(--green); }
+.btn-red { background: rgba(247,90,90,0.15); color: var(--red); border-color: var(--red-d); }
+
+/* Inputs */
+input, select { font-size: 12px; padding: 6px 10px; border: .5px solid var(--bd2); border-radius: 6px; background: var(--bg3); color: var(--text); outline: none; }
+input:focus, select:focus { border-color: var(--blue); }
+
+/* Index tabs */
+.itabs { display: flex; gap: 4px; margin-bottom: 14px; }
+.itab { font-size: 12px; padding: 5px 14px; border: .5px solid var(--bd); border-radius: 6px; background: transparent; color: var(--t2); cursor: pointer; }
+.itab.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+/* Metrics grid */
+.metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 14px; }
+.metric { background: var(--bg3); border: .5px solid var(--bd); border-radius: var(--r); padding: 12px; text-align: center; }
+.metric-l { font-size: 10px; color: var(--t2); margin-bottom: 4px; }
+.metric-v { font-size: 20px; font-weight: 700; }
+
+/* Signal boxes */
+.sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.sig-box { border-radius: var(--r); padding: 16px; border: 1px solid; }
+.sig-box.strong { background: rgba(52,201,122,0.07); border-color: rgba(52,201,122,0.3); }
+.sig-box.moderate { background: rgba(247,168,52,0.07); border-color: rgba(247,168,52,0.3); }
+.sig-box.weak { background: rgba(167,139,250,0.07); border-color: rgba(167,139,250,0.3); }
+.sig-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.sig-pick { font-size: 24px; font-weight: 800; margin-bottom: 8px; letter-spacing: -.5px; }
+.sig-reasons { font-size: 11px; color: var(--t2); line-height: 1.7; }
+.sig-box.strong .sig-label { color: var(--green); }
+.sig-box.moderate .sig-label { color: var(--amber); }
+.sig-box.weak .sig-label { color: var(--purple); }
+.sig-box.strong .sig-pick { color: var(--green); }
+.sig-box.moderate .sig-pick { color: var(--amber); }
+.sig-box.weak .sig-pick { color: var(--purple); }
+
+/* Patterns */
+.dow-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-bottom: 12px; }
+.dow-cell { background: var(--bg3); border-radius: 8px; padding: 10px 6px; text-align: center; border: .5px solid var(--bd); }
+.dow-name { font-size: 10px; color: var(--t2); margin-bottom: 4px; }
+.dow-val { font-size: 13px; font-weight: 700; }
+.dow-sub { font-size: 10px; color: var(--t3); margin-top: 2px; }
+.heatmap { display: grid; grid-template-columns: repeat(10,1fr); gap: 5px; }
+.hm-cell { padding: 8px 2px; border-radius: 6px; text-align: center; font-size: 11px; font-weight: 700; }
+
+/* Journal */
+.jrow { display: grid; align-items: center; gap: 4px; padding: 7px 0; border-bottom: .5px solid var(--bd); font-size: 11px; }
+.jrow:last-child { border: none; }
+.pill { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.pill-odd { background: rgba(79,142,247,0.2); color: var(--blue); }
+.pill-even { background: rgba(52,201,122,0.2); color: var(--green); }
+.pill-hi { background: rgba(247,168,52,0.2); color: var(--amber); }
+.pill-lo { background: rgba(167,139,250,0.2); color: var(--purple); }
+.pill-win { background: rgba(52,201,122,0.2); color: var(--green); }
+.pill-loss { background: rgba(247,90,90,0.2); color: var(--red); }
+.pill-pending { background: var(--bg4); color: var(--t2); }
+.pill-strong { background: rgba(52,201,122,0.15); color: var(--green); }
+.pill-moderate { background: rgba(247,168,52,0.15); color: var(--amber); }
+.pill-weak { background: rgba(167,139,250,0.15); color: var(--purple); }
+.win { color: var(--green); font-weight: 700; }
+.loss { color: var(--red); font-weight: 700; }
+
+/* Model */
+.model-bar { height: 6px; border-radius: 3px; background: var(--bg4); margin: 4px 0 10px; }
+.model-fill { height: 6px; border-radius: 3px; transition: width .4s; }
+.perf-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+.perf-card { background: var(--bg3); border: .5px solid var(--bd); border-radius: var(--r); padding: 12px; }
+.perf-label { font-size: 10px; color: var(--t2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.perf-val { font-size: 20px; font-weight: 700; }
+.perf-sub { font-size: 11px; color: var(--t2); margin-top: 3px; }
+
+/* Chart */
+.ch { position: relative; width: 100%; height: 100px; margin-top: 8px; }
+.sg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.sc { background: var(--bg3); border-radius: var(--r); padding: 12px; border: .5px solid var(--bd); }
+.cbox { background: var(--bg3); border-radius: var(--r); padding: 10px 14px; font-size: 11px; color: var(--t2); margin-bottom: 12px; line-height: 1.9; border: .5px solid var(--bd); }
+.trow { display: grid; gap: 4px; padding: 5px 0; border-bottom: .5px solid var(--bd); font-size: 11px; align-items: center; }
+.trow:last-child { border: none; }
+
+/* Row helper */
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.note { font-size: 10px; color: var(--t3); margin-top: 6px; font-style: italic; }
+strong { font-weight: 700; }
 </style>
 </head>
 <body>
-<h1>Index Signal Analyser + Pattern Finder</h1>
-<p class="sub">FTSE 100 · Dow Jones · Nasdaq · Odd/Even &amp; Last Digit &gt;4.5 · Pattern-based bet suggestions</p>
+<div class="shell">
 
-<div id="sbar" class="sbar load"><span class="spin"></span>Connecting to worker...</div>
-
-<div class="card" id="fetch-card" style="display:none;">
-  <div class="stitle">Data</div>
-  <div class="row">
-    <button class="btn bp" onclick="fetchAll()">⬇ Fetch All 3 Indices</button>
-    <span style="font-size:11px;color:var(--t2);">6 months · Google Finance · Official EOD closes</span>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-name">Signal Analyser</div>
+    <div class="brand-sub">FTSE · DJIA · Nasdaq</div>
   </div>
-  <div class="row" style="margin-top:4px;">
-    <select id="m-idx"><option value="ftse">FTSE 100</option><option value="djia">Dow Jones</option><option value="nasdaq">Nasdaq</option></select>
-    <input type="text" id="m-date" placeholder="YYYY-MM-DD" style="width:110px;">
-    <input type="number" id="m-close" placeholder="Today's close" step="0.01" style="width:130px;">
-    <button class="btn" onclick="manualAdd()">Add today's close</button>
-    <span id="m-msg" style="font-size:11px;color:var(--t2);"></span>
-  </div>
+  <div class="nav-section">Analysis</div>
+  <div class="nav-item active" onclick="showPage('signals',this)"><span class="nav-icon">📊</span> Signals</div>
+  <div class="nav-item" onclick="showPage('patterns',this)"><span class="nav-icon">🔍</span> Patterns</div>
+  <div class="nav-item" onclick="showPage('backtest',this)"><span class="nav-icon">📈</span> Backtest</div>
+  <div class="nav-section">Bets</div>
+  <div class="nav-item" onclick="showPage('journal',this)"><span class="nav-icon">📒</span> Bet Journal</div>
+  <div class="nav-item" onclick="showPage('model',this)"><span class="nav-icon">🧠</span> Model</div>
+  <div class="nav-section">Data</div>
+  <div class="nav-item" onclick="showPage('data',this)"><span class="nav-icon">⚡</span> Fetch Data</div>
 </div>
 
-<div id="analysis" style="display:none;">
+<!-- MAIN -->
+<div class="main">
+  <div id="sbar" class="sbar load"><span class="spin"></span>Connecting to worker...</div>
 
-  <!-- TODAY'S BET SUGGESTION -->
-  <div class="card">
-    <div class="stitle">Today's bet suggestion</div>
-    <div class="tabs" id="idx-tabs2">
-      <button class="tab active" onclick="setIdx('ftse',this,'2')">FTSE 100</button>
-      <button class="tab" onclick="setIdx('djia',this,'2')">Dow Jones</button>
-      <button class="tab" onclick="setIdx('nasdaq',this,'2')">Nasdaq</button>
-    </div>
-    <div id="bet-suggestions"></div>
-  </div>
-
-  <!-- PATTERN ANALYSIS -->
-  <div class="card">
-    <div class="stitle">Pattern analysis</div>
-    <div class="tabs" id="idx-tabs3">
-      <button class="tab active" onclick="setIdx('ftse',this,'3')">FTSE 100</button>
-      <button class="tab" onclick="setIdx('djia',this,'3')">Dow Jones</button>
-      <button class="tab" onclick="setIdx('nasdaq',this,'3')">Nasdaq</button>
-    </div>
-
-    <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;">Overall frequency</div>
-    <div class="metrics" id="pat-metrics"></div>
-
-    <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;">Day-of-week pattern (Signal 1: Odd/Even)</div>
-    <div class="dow-grid" id="dow-oe"></div>
-
-    <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;">Day-of-week pattern (Signal 2: Last digit &gt;4.5)</div>
-    <div class="dow-grid" id="dow-hilo"></div>
-
-    <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;">After-streak analysis — what follows N consecutive same outcomes</div>
-    <div id="streak-analysis"></div>
-
-    <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;margin-top:10px;">Last digit heatmap (0–9 frequency)</div>
-    <div class="heatmap" id="digit-heatmap"></div>
-  </div>
-
-  <!-- P&L BACKTEST -->
-  <div class="card">
-    <div class="stitle">P&amp;L backtest</div>
-    <div class="tabs" id="idx-tabs">
-      <button class="tab active" onclick="setIdx('ftse',this,'1')">FTSE 100</button>
-      <button class="tab" onclick="setIdx('djia',this,'1')">Dow Jones</button>
-      <button class="tab" onclick="setIdx('nasdaq',this,'1')">Nasdaq</button>
-    </div>
-    <div id="idx-info" style="font-size:10px;color:var(--t3);margin-bottom:8px;"></div>
-    <div class="sg">
-      <div class="sc">
-        <div style="font-size:11px;font-weight:700;margin-bottom:3px;">Signal 1 — Odd / Even</div>
-        <div style="font-size:11px;color:var(--t2);" id="s1stats"></div>
-        <div class="ch"><canvas id="c1"></canvas></div>
+  <!-- DATA PAGE -->
+  <div id="page-data" style="display:none;">
+    <div class="card">
+      <div class="card-title">Market Data — Google Finance (6 months EOD)</div>
+      <div class="row">
+        <button class="btn btn-primary" onclick="fetchAll()">⬇ Fetch All 3 Indices</button>
+        <span style="font-size:11px;color:var(--t2);">Official closing prices via Google Sheets</span>
       </div>
-      <div class="sc">
-        <div style="font-size:11px;font-weight:700;margin-bottom:3px;">Signal 2 — Last digit &gt; 4.5</div>
-        <div style="font-size:11px;color:var(--t2);" id="s2stats"></div>
-        <div class="ch"><canvas id="c2"></canvas></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:.5px solid var(--bd);">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px;">Add manual close (today after market closes)</div>
+        <div class="row">
+          <select id="m-idx"><option value="ftse">FTSE 100</option><option value="djia">Dow Jones</option><option value="nasdaq">Nasdaq</option></select>
+          <input type="text" id="m-date" placeholder="YYYY-MM-DD" style="width:115px;">
+          <input type="number" id="m-close" placeholder="Close price" step="0.01" style="width:125px;">
+          <button class="btn" onclick="manualAdd()">Add</button>
+          <span id="m-msg" style="font-size:11px;color:var(--t2);"></span>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <label>Sig 1:</label><select id="s1"><option value="odd">ODD</option><option value="even">EVEN</option></select>
-      <label>Sig 2:</label><select id="s2"><option value="hi">OVER 4.5</option><option value="lo">UNDER 4.5</option></select>
-      <label>Stake:</label><input type="number" id="stake" value="10" min="1" style="width:68px;">
-      <label>Odds:</label><input type="number" id="odds" value="1.93" step="0.01" min="1.01" style="width:63px;">
-      <button class="btn bp" onclick="renderBacktest()">Update ↗</button>
+    <div class="card" id="data-status-card" style="display:none;">
+      <div class="card-title">Loaded data</div>
+      <div id="data-summary"></div>
     </div>
-    <div class="cbox" id="comb"></div>
-    <div class="stitle">All closes</div>
-    <div id="thead" class="trow" style="font-weight:700;font-size:10px;color:var(--t2);"></div>
-    <div id="tbody"></div>
-    <p class="note" id="drange"></p>
   </div>
+
+  <!-- SIGNALS PAGE -->
+  <div id="page-signals" style="display:none;">
+    <div class="card">
+      <div class="card-title">
+        Today's signals
+        <div class="itabs" style="margin:0;">
+          <div class="itab active" onclick="setIdx('ftse',this,'sig')">FTSE</div>
+          <div class="itab" onclick="setIdx('djia',this,'sig')">DJIA</div>
+          <div class="itab" onclick="setIdx('nasdaq',this,'sig')">Nasdaq</div>
+        </div>
+      </div>
+      <div id="bet-suggestions"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:.5px solid var(--bd);">
+        <div class="row">
+          <label style="font-size:12px;color:var(--t2);">Stake:</label>
+          <input type="number" id="log-stake" value="10" min="1" style="width:70px;">
+          <label style="font-size:12px;color:var(--t2);">Odds:</label>
+          <input type="number" id="log-odds" value="1.93" step="0.01" style="width:65px;">
+          <button class="btn btn-green" onclick="logSuggestedBets()">📒 Log Suggested Bets</button>
+          <span id="log-msg" style="font-size:11px;color:var(--t2);"></span>
+        </div>
+      </div>
+    </div>
+    <div id="last-close-card" class="card" style="display:none;">
+      <div class="card-title">Last close summary</div>
+      <div id="last-close-info" style="font-size:12px;color:var(--t2);line-height:1.9;"></div>
+    </div>
+  </div>
+
+  <!-- PATTERNS PAGE -->
+  <div id="page-patterns" style="display:none;">
+    <div class="card">
+      <div class="card-title">
+        Pattern analysis
+        <div class="itabs" style="margin:0;">
+          <div class="itab active" onclick="setIdx('ftse',this,'pat')">FTSE</div>
+          <div class="itab" onclick="setIdx('djia',this,'pat')">DJIA</div>
+          <div class="itab" onclick="setIdx('nasdaq',this,'pat')">Nasdaq</div>
+        </div>
+      </div>
+      <div class="metrics" id="pat-metrics"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px;">Day-of-week · Odd/Even</div>
+      <div class="dow-grid" id="dow-oe"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px;">Day-of-week · Last digit &gt;4.5</div>
+      <div class="dow-grid" id="dow-hilo"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px;">After-streak tendency</div>
+      <div id="streak-analysis"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px;margin-top:12px;">Last digit heatmap (0–9)</div>
+      <div class="heatmap" id="digit-heatmap"></div>
+    </div>
+  </div>
+
+  <!-- BACKTEST PAGE -->
+  <div id="page-backtest" style="display:none;">
+    <div class="card">
+      <div class="card-title">
+        P&amp;L backtest
+        <div class="itabs" style="margin:0;">
+          <div class="itab active" onclick="setIdx('ftse',this,'bt')">FTSE</div>
+          <div class="itab" onclick="setIdx('djia',this,'bt')">DJIA</div>
+          <div class="itab" onclick="setIdx('nasdaq',this,'bt')">Nasdaq</div>
+        </div>
+      </div>
+      <div id="bt-info" style="font-size:10px;color:var(--t3);margin-bottom:10px;"></div>
+      <div class="sg">
+        <div class="sc"><div style="font-size:11px;font-weight:600;margin-bottom:4px;">Signal 1 — Odd/Even</div><div style="font-size:11px;color:var(--t2);" id="s1stats"></div><div class="ch"><canvas id="c1"></canvas></div></div>
+        <div class="sc"><div style="font-size:11px;font-weight:600;margin-bottom:4px;">Signal 2 — Digit &gt;4.5</div><div style="font-size:11px;color:var(--t2);" id="s2stats"></div><div class="ch"><canvas id="c2"></canvas></div></div>
+      </div>
+      <div class="row">
+        <label>Sig 1:</label><select id="s1"><option value="odd">ODD</option><option value="even">EVEN</option></select>
+        <label>Sig 2:</label><select id="s2"><option value="hi">OVER 4.5</option><option value="lo">UNDER 4.5</option></select>
+        <label>Stake:</label><input type="number" id="bt-stake" value="10" min="1" style="width:65px;">
+        <label>Odds:</label><input type="number" id="bt-odds" value="1.93" step="0.01" style="width:60px;">
+        <button class="btn btn-primary" onclick="renderBacktest()">Update</button>
+      </div>
+      <div class="cbox" id="bt-comb"></div>
+      <div id="bt-thead" class="trow" style="font-weight:700;font-size:10px;color:var(--t2);"></div>
+      <div id="bt-tbody"></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL PAGE -->
+  <div id="page-journal" style="display:none;">
+    <div class="card">
+      <div class="card-title">Settle pending bets</div>
+      <div class="row">
+        <select id="s-idx"><option value="ftse">FTSE 100</option><option value="djia">Dow Jones</option><option value="nasdaq">Nasdaq</option></select>
+        <input type="text" id="s-date" placeholder="YYYY-MM-DD" style="width:115px;">
+        <input type="number" id="s-close" placeholder="Official close" step="0.01" style="width:135px;">
+        <button class="btn btn-primary" onclick="settleBets()">✓ Settle</button>
+        <span id="s-msg" style="font-size:11px;color:var(--t2);"></span>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--bd);">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:8px;">Log manual bet</div>
+        <div class="row">
+          <select id="j-idx"><option value="ftse">FTSE 100</option><option value="djia">Dow Jones</option><option value="nasdaq">Nasdaq</option></select>
+          <input type="text" id="j-date" placeholder="YYYY-MM-DD" style="width:115px;">
+          <select id="j-sig"><option value="oe">Odd/Even</option><option value="hilo">Hi/Lo</option></select>
+          <select id="j-pick"><option value="odd">ODD</option><option value="even">EVEN</option><option value="hi">OVER 4.5</option><option value="lo">UNDER 4.5</option></select>
+          <input type="number" id="j-stake" value="10" style="width:60px;">
+          <input type="number" id="j-odds" value="1.93" step="0.01" style="width:58px;">
+          <select id="j-conf"><option value="strong">Strong</option><option value="moderate">Moderate</option><option value="weak">Weak</option></select>
+          <button class="btn" onclick="logBet()">+ Log</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        Bet journal <span id="journal-count" style="color:var(--t3);font-weight:400;font-size:10px;"></span>
+        <div class="row" style="margin:0;gap:6px;">
+          <select id="j-filter" onchange="renderJournal()" style="font-size:11px;padding:3px 7px;">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+            <option value="strong">Strong only</option>
+          </select>
+          <button class="btn btn-red" onclick="clearJournal()" style="font-size:11px;padding:3px 10px;">Clear</button>
+        </div>
+      </div>
+      <div id="j-stats" style="font-size:12px;color:var(--t2);margin-bottom:10px;padding-bottom:10px;border-bottom:.5px solid var(--bd);"></div>
+      <div id="j-thead" class="trow" style="font-weight:700;font-size:10px;color:var(--t3);"></div>
+      <div id="j-tbody"></div>
+    </div>
+  </div>
+
+  <!-- MODEL PAGE -->
+  <div id="page-model" style="display:none;">
+    <div class="metrics" id="model-overview"></div>
+    <div class="card">
+      <div class="card-title">Performance by confidence level</div>
+      <div class="perf-grid" id="model-by-conf"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Performance by signal type</div>
+      <div class="perf-grid" id="model-by-signal"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Factor weights (auto-adjusted from real bets)</div>
+      <p style="font-size:11px;color:var(--t2);margin-bottom:12px;">Weights shift based on which factors actually predicted your real bets correctly. Needs 20+ settled bets.</p>
+      <div id="model-weights"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Model assessment</div>
+      <div id="model-assessment"></div>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
-const WORKER='https://massive-proxy.dheeraj-0b8.workers.dev';
-const LABELS={ftse:'FTSE 100',djia:'Dow Jones (DJIA)',nasdaq:'Nasdaq Composite'};
-const COLORS={ftse:'#185FA5',djia:'#2E6B0F',nasdaq:'#4A3FAF'};
-const MIN_C={ftse:3000,djia:10000,nasdaq:3000};
-const DAYS=['Mon','Tue','Wed','Thu','Fri'];
-const DB={ftse:[],djia:[],nasdaq:[]};
-let activeIdx='ftse';
-let ch1,ch2;
+const WORKER = 'https://massive-proxy.dheeraj-0b8.workers.dev';
+const LABELS = { ftse:'FTSE 100', djia:'Dow Jones', nasdaq:'Nasdaq' };
+const COLORS = { ftse:'#4f8ef7', djia:'#34c97a', nasdaq:'#a78bfa' };
+const MIN_C  = { ftse:3000, djia:10000, nasdaq:3000 };
+const DAYS   = ['Mon','Tue','Wed','Thu','Fri'];
+const DB     = { ftse:[], djia:[], nasdaq:[] };
+let activeIdx = 'ftse';
+let ch1, ch2;
+let lastSuggestions = null;
+let currentPage = 'signals';
 
-function setBar(msg,type){const b=document.getElementById('sbar');b.className='sbar '+type;b.innerHTML=type==='load'?`<span class="spin"></span>${msg}`:msg;}
+// ─── KV STORAGE (Cloudflare KV via Worker) ───
+async function kvGet(key) {
+  try {
+    const r = await fetch(`${WORKER}/kv/${key}`);
+    const d = await r.json();
+    return d.value ? JSON.parse(d.value) : null;
+  } catch(e) { return null; }
+}
+async function kvPut(key, value) {
+  try {
+    await fetch(`${WORKER}/kv/${key}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(value)
+    });
+  } catch(e) { console.error('KV put error:', e); }
+}
+async function loadJournal() { return (await kvGet('journal')) || []; }
+async function saveJournal(j) { await kvPut('journal', j); }
+async function loadWeights() {
+  const w = await kvGet('weights');
+  return w || { baseFreq:0.25, streakFollow:0.35, dayOfWeek:0.20, altRate:0.20 };
+}
+async function saveWeights(w) { await kvPut('weights', w); }
 
-// Set active index for a specific tab group
-function setIdx(idx,btn,group){
-  activeIdx=idx;
-  document.querySelectorAll('#idx-tabs'+group+' .tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  if(group==='1') renderBacktest();
-  else if(group==='2') renderBetSuggestion();
-  else if(group==='3') renderPatterns();
+// ─── NAV ───
+function showPage(page, el) {
+  currentPage = page;
+  ['signals','patterns','backtest','journal','model','data'].forEach(p => {
+    document.getElementById('page-'+p).style.display = p===page ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(page==='journal') renderJournal();
+  if(page==='model') renderModel();
+  if(page==='backtest') renderBacktest();
+  if(page==='patterns') renderPatterns();
 }
 
-async function checkWorker(){
-  try{
-    const r=await fetch(`${WORKER}/health`,{signal:AbortSignal.timeout(8000)});
-    const d=await r.json();
-    if(d.status==='ok'){setBar('✓ Worker connected — fetch data below','ok');document.getElementById('fetch-card').style.display='block';}
-    else throw new Error();
-  }catch(e){setBar('✗ Worker not reachable','err');}
+function setBar(msg, type) {
+  const b = document.getElementById('sbar');
+  b.className = 'sbar ' + type;
+  b.innerHTML = type==='load' ? `<span class="spin"></span>${msg}` : msg;
 }
 
-async function fetchAll(){
-  setBar('Fetching from Google Finance...','load');
-  try{
-    const r=await fetch(`${WORKER}/data`,{signal:AbortSignal.timeout(30000)});
-    const json=await r.json();
-    if(json.error) throw new Error(json.error);
-    if(!json.data) throw new Error('No data: '+JSON.stringify(json).slice(0,100));
-    const msgs=[];
-    for(const idx of ['ftse','djia','nasdaq']){
-      DB[idx]=(json.data[idx]||[]).filter(d=>d.close>MIN_C[idx]);
-      msgs.push(`${LABELS[idx]}: <strong>${DB[idx].length}d</strong>`);
+// ─── DATA ───
+async function checkWorker() {
+  try {
+    const r = await fetch(`${WORKER}/health`, { signal: AbortSignal.timeout(8000) });
+    const d = await r.json();
+    if(d.status === 'ok') {
+      const kvStatus = d.kv ? '✓ KV storage active' : '⚠ KV not configured';
+      setBar(`✓ Worker connected · ${kvStatus}`, d.kv ? 'ok' : 'warn');
+      document.getElementById('page-data').style.display = 'block';
+      showPage('data', document.querySelector('.nav-item'));
+    } else throw new Error();
+  } catch(e) {
+    setBar('✗ Worker not reachable — check Cloudflare dashboard', 'err');
+  }
+}
+
+async function fetchAll() {
+  setBar('Fetching from Google Finance...', 'load');
+  try {
+    const r = await fetch(`${WORKER}/data`, { signal: AbortSignal.timeout(30000) });
+    const json = await r.json();
+    if(!json.data) throw new Error(json.error || 'No data');
+    const msgs = [];
+    for(const idx of ['ftse','djia','nasdaq']) {
+      DB[idx] = (json.data[idx]||[]).filter(d => d.close > MIN_C[idx]);
+      msgs.push(`${LABELS[idx]}: ${DB[idx].length}d`);
     }
-    if(!Object.values(DB).some(a=>a.length>0)) throw new Error('All indices returned 0 rows');
-    setBar(msgs.join(' &nbsp;·&nbsp; ')+' ✓','ok');
-    document.getElementById('analysis').style.display='block';
-    renderBetSuggestion();
-    renderPatterns();
-    renderBacktest();
-  }catch(e){setBar('✗ '+e.message,'err');}
+    setBar('✓ ' + msgs.join(' · '), 'ok');
+    document.getElementById('data-status-card').style.display = 'block';
+    document.getElementById('data-summary').innerHTML = msgs.map(m =>
+      `<div style="font-size:12px;color:var(--t2);margin-bottom:4px;">✓ ${m}</div>`
+    ).join('');
+    // Auto-show signals
+    showPage('signals', document.querySelectorAll('.nav-item')[0]);
+    renderSignals();
+  } catch(e) { setBar('✗ ' + e.message, 'err'); }
 }
 
 // ─── SIGNAL HELPERS ───
-function sig(c){const d=Math.floor(c)%10;return{digit:d,oe:Math.floor(c)%2===0?'even':'odd',hilo:d>4?'hi':'lo'};}
-function dow(dateStr){return new Date(dateStr+'T12:00:00Z').getUTCDay();} // 1=Mon..5=Fri
-function pnl(win,stake,odds){return win?+(stake*(odds-1)).toFixed(2):-stake;}
+function sig(c) { const d=Math.floor(c)%10; return {digit:d, oe:Math.floor(c)%2===0?'even':'odd', hilo:d>4?'hi':'lo'}; }
+function dow(dateStr) { return new Date(dateStr+'T12:00:00Z').getUTCDay(); }
+function pnl(win, stake, odds) { return win ? +(stake*(odds-1)).toFixed(2) : -stake; }
+function today() { return new Date().toISOString().slice(0,10); }
 
 // ─── PATTERN ENGINE ───
-function analysePatterns(data){
+function analysePatterns(data, W) {
   if(!data||data.length<5) return null;
+  const n = data.length;
+  W = W || { baseFreq:0.25, streakFollow:0.35, dayOfWeek:0.20, altRate:0.20 };
+  const s = data.map(d => ({...d, ...sig(d.close), day:dow(d.date)}));
 
-  const n=data.length;
-  const signals=data.map(d=>({...d,...sig(d.close),day:dow(d.date)}));
+  const oeC={odd:0,even:0}, hiloC={hi:0,lo:0}, digC=Array(10).fill(0);
+  s.forEach(x=>{oeC[x.oe]++;hiloC[x.hilo]++;digC[x.digit]++;});
 
-  // 1. Overall frequencies
-  const oeCount={odd:0,even:0};
-  const hiloCount={hi:0,lo:0};
-  const digitCount=Array(10).fill(0);
-  signals.forEach(s=>{oeCount[s.oe]++;hiloCount[s.hilo]++;digitCount[s.digit]++;});
+  const dOE={}, dHL={};
+  for(let d=1;d<=5;d++){dOE[d]={odd:0,even:0,total:0};dHL[d]={hi:0,lo:0,total:0};}
+  s.forEach(x=>{ if(x.day>=1&&x.day<=5){dOE[x.day][x.oe]++;dOE[x.day].total++;dHL[x.day][x.hilo]++;dHL[x.day].total++;} });
 
-  // 2. Day-of-week breakdown (Mon=1..Fri=5)
-  const dowOE={};const dowHilo={};
-  for(let d=1;d<=5;d++){dowOE[d]={odd:0,even:0,total:0};dowHilo[d]={hi:0,lo:0,total:0};}
-  signals.forEach(s=>{
-    if(s.day>=1&&s.day<=5){
-      dowOE[s.day][s.oe]++;dowOE[s.day].total++;
-      dowHilo[s.day][s.hilo]++;dowHilo[s.day].total++;
-    }
-  });
-
-  // 3. Streak analysis — after N same in a row, what comes next?
-  const streakFollowOE={1:{same:0,diff:0},2:{same:0,diff:0},3:{same:0,diff:0}};
-  const streakFollowHilo={1:{same:0,diff:0},2:{same:0,diff:0},3:{same:0,diff:0}};
-  for(let i=3;i<n;i++){
-    for(let len=1;len<=3;len++){
+  const sfOE={1:{same:0,diff:0},2:{same:0,diff:0},3:{same:0,diff:0}};
+  const sfHL={1:{same:0,diff:0},2:{same:0,diff:0},3:{same:0,diff:0}};
+  for(let i=3;i<n;i++) {
+    for(let len=1;len<=3;len++) {
       if(i<len) continue;
-      // Check if last `len` are all same OE
-      const lastOE=signals[i-1].oe;
-      let allSameOE=true;
-      for(let j=2;j<=len;j++) if(signals[i-j].oe!==lastOE) allSameOE=false;
-      if(allSameOE){
-        if(signals[i].oe===lastOE) streakFollowOE[len].same++;
-        else streakFollowOE[len].diff++;
-      }
-      // Check hilo
-      const lastHilo=signals[i-1].hilo;
-      let allSameHilo=true;
-      for(let j=2;j<=len;j++) if(signals[i-j].hilo!==lastHilo) allSameHilo=false;
-      if(allSameHilo){
-        if(signals[i].hilo===lastHilo) streakFollowHilo[len].same++;
-        else streakFollowHilo[len].diff++;
-      }
+      const lOE=s[i-1].oe; let ok=true; for(let j=2;j<=len;j++) if(s[i-j].oe!==lOE)ok=false;
+      if(ok){if(s[i].oe===lOE)sfOE[len].same++;else sfOE[len].diff++;}
+      const lHL=s[i-1].hilo; ok=true; for(let j=2;j<=len;j++) if(s[i-j].hilo!==lHL)ok=false;
+      if(ok){if(s[i].hilo===lHL)sfHL[len].same++;else sfHL[len].diff++;}
     }
   }
 
-  // 4. Current streak
-  let curStreakOE=1,curStreakHilo=1;
-  const lastOE=signals[n-1].oe, lastHilo=signals[n-1].hilo;
-  for(let i=n-2;i>=0;i--){
-    if(signals[i].oe===lastOE) curStreakOE++; else break;
-  }
-  for(let i=n-2;i>=0;i--){
-    if(signals[i].hilo===lastHilo) curStreakHilo++; else break;
-  }
+  let csOE=1,csHL=1;
+  const lOE=s[n-1].oe, lHL=s[n-1].hilo;
+  for(let i=n-2;i>=0;i--){if(s[i].oe===lOE)csOE++;else break;}
+  for(let i=n-2;i>=0;i--){if(s[i].hilo===lHL)csHL++;else break;}
 
-  // 5. Alternating pattern detection
-  let altCountOE=0,altCountHilo=0;
-  for(let i=1;i<n;i++){
-    if(signals[i].oe!==signals[i-1].oe) altCountOE++;
-    if(signals[i].hilo!==signals[i-1].hilo) altCountHilo++;
-  }
-  const altRateOE=altCountOE/(n-1);
-  const altRateHilo=altCountHilo/(n-1);
+  let acOE=0,acHL=0;
+  for(let i=1;i<n;i++){if(s[i].oe!==s[i-1].oe)acOE++;if(s[i].hilo!==s[i-1].hilo)acHL++;}
 
-  // 6. Tomorrow's day of week
-  const tomorrow=new Date();
-  const tomorrowDay=tomorrow.getDay()===5?1:(tomorrow.getDay()===6?1:tomorrow.getDay()+1);
-  // Use today's close day
-  const todayDay=signals[n-1].day;
-  const nextTradingDay=(todayDay===5||todayDay===0)?1:(todayDay%7)+1;
+  return {n,s,oeC,hiloC,digC,dOE,dHL,sfOE,sfHL,csOE,csHL,lOE,lHL,
+    arOE:acOE/(n-1),arHL:acHL/(n-1),last:s[n-1],W};
+}
 
+function getBetSug(p, signal) {
+  const W=p.W;
+  const total=signal==='oe'?p.oeC.odd+p.oeC.even:p.hiloC.hi+p.hiloC.lo;
+  const streak=signal==='oe'?p.csOE:p.csHL;
+  const last=signal==='oe'?p.lOE:p.lHL;
+  const ar=signal==='oe'?p.arOE:p.arHL;
+  const sf=signal==='oe'?p.sfOE:p.sfHL;
+  const dd=signal==='oe'?p.dOE:p.dHL;
+  const nextDay=(p.last.day%5)+1;
+
+  const bf=(signal==='oe'?p.oeC[last]:p.hiloC[last])/total;
+  const cap=Math.min(streak,3);
+  const sfd=sf[cap];
+  const scr=(sfd.same+sfd.diff>0)?sfd.same/(sfd.same+sfd.diff):0.5;
+  let db=0.5;
+  if(dd[nextDay]&&dd[nextDay].total>=3) db=(dd[nextDay][last]||0)/dd[nextDay].total;
+  let as=ar>0.58?0.35:ar<0.42?0.65:0.5;
+
+  const score=(bf*W.baseFreq)+(scr*W.streakFollow)+(db*W.dayOfWeek)+(as*W.altRate);
+  const opp=signal==='oe'?(last==='odd'?'even':'odd'):(last==='hi'?'lo':'hi');
+  let rec,conf;
+  if(score>=0.60){rec=last;conf='strong';}
+  else if(score<=0.40){rec=opp;conf='strong';}
+  else if(score>=0.54){rec=last;conf='moderate';}
+  else if(score<=0.46){rec=opp;conf='moderate';}
+  else{rec=null;conf='weak';}
+
+  const nd=['','Mon','Tue','Wed','Thu','Fri'][nextDay]||'next';
   return {
-    n, signals, oeCount, hiloCount, digitCount,
-    dowOE, dowHilo, streakFollowOE, streakFollowHilo,
-    curStreakOE, curStreakHilo, lastOE, lastHilo,
-    altRateOE, altRateHilo, nextTradingDay,
-    lastSignal: signals[n-1]
+    rec,conf,score,signal,last,streak,
+    factors:{baseFreq:bf,streakFollow:scr,dayOfWeek:db,altRate:as},
+    reasons:[
+      `Base rate: ${Math.round(bf*100)}% for ${last.toUpperCase()}`,
+      `Current streak: ${streak}× ${last.toUpperCase()} → continues ${Math.round(scr*100)}% after ${cap}-streak`,
+      dd[nextDay]&&dd[nextDay].total>=3?`${nd} hit rate for ${last.toUpperCase()}: ${Math.round(((dd[nextDay][last]||0)/dd[nextDay].total)*100)}% (${dd[nextDay].total} samples)`:null,
+      `Alternation: ${Math.round(ar*100)}% (${ar>0.55?'tends to alternate':'tends to streak'})`
+    ].filter(Boolean)
   };
 }
 
-// ─── CONFIDENCE SCORE ───
-function getBetSuggestion(p, signal){
-  // signal: 'oe' or 'hilo'
-  const total = signal==='oe' ? p.oeCount.odd+p.oeCount.even : p.hiloCount.hi+p.hiloCount.lo;
-  const streak = signal==='oe' ? p.curStreakOE : p.curStreakHilo;
-  const last = signal==='oe' ? p.lastOE : p.lastHilo;
-  const altRate = signal==='oe' ? p.altRateOE : p.altRateHilo;
-  const streakFollow = signal==='oe' ? p.streakFollowOE : p.streakFollowHilo;
-  const dayData = signal==='oe' ? p.dowOE : p.dowHilo;
-  const nextDay = p.nextTradingDay;
-
-  // Base frequency
-  const baseFreq = signal==='oe'
-    ? p.oeCount[last] / total
-    : p.hiloCount[last] / total;
-
-  // Streak tendency — does this index tend to continue or reverse?
-  const capStreak = Math.min(streak, 3);
-  const sf = streakFollow[capStreak];
-  const streakContinueRate = (sf.same+sf.diff>0) ? sf.same/(sf.same+sf.diff) : 0.5;
-
-  // Day-of-week bias
-  let dowBias = 0.5;
-  if(dayData[nextDay] && dayData[nextDay].total>=3){
-    const dd = dayData[nextDay];
-    dowBias = signal==='oe'
-      ? (dd[last]||0)/dd.total
-      : (dd[last]||0)/dd.total;
-  }
-
-  // Alternating rate
-  // If altRate>0.55 → index tends to alternate → fade the streak
-  // If altRate<0.45 → index tends to continue → follow the streak
-  let altSignal = 0.5;
-  if(altRate > 0.58) altSignal = 0.35; // tends to alternate → predict opposite
-  else if(altRate < 0.42) altSignal = 0.65; // tends to continue → predict same
-
-  // Weighted score for CONTINUING last outcome
-  const score = (baseFreq*0.25) + (streakContinueRate*0.35) + (dowBias*0.20) + (altSignal*0.20);
-
-  // Determine recommendation
-  let recommend, confidence, reason;
-  const oppLast = signal==='oe'
-    ? (last==='odd'?'even':'odd')
-    : (last==='hi'?'lo':'hi');
-
-  if(score >= 0.60){
-    recommend = last; // continue
-    confidence = 'strong';
-  } else if(score <= 0.40){
-    recommend = oppLast; // reverse
-    confidence = 'strong';
-  } else if(score >= 0.54){
-    recommend = last;
-    confidence = 'moderate';
-  } else if(score <= 0.46){
-    recommend = oppLast;
-    confidence = 'moderate';
-  } else {
-    recommend = null;
-    confidence = 'weak';
-  }
-
-  // Build reason text
-  const streakSuffix = streak===1?'1 day':''+streak+' days';
-  const altPct = Math.round(altRate*100);
-  const dowName = ['','Mon','Tue','Wed','Thu','Fri','Sat','Sun'][nextDay]||'next day';
-
-  const reasons = [];
-  if(baseFreq>0.54) reasons.push(`base rate ${Math.round(baseFreq*100)}% for ${last}`);
-  else if(baseFreq<0.46) reasons.push(`base rate only ${Math.round(baseFreq*100)}% for ${last} (below 50%)`);
-  reasons.push(`current streak: ${streakSuffix} of ${last.toUpperCase()}`);
-  if(streakContinueRate>0.55) reasons.push(`after ${capStreak}-streak, continues ${Math.round(streakContinueRate*100)}% of time`);
-  else if(streakContinueRate<0.45) reasons.push(`after ${capStreak}-streak, reverses ${Math.round((1-streakContinueRate)*100)}% of time`);
-  if(dayData[nextDay]&&dayData[nextDay].total>=3){
-    const dd=dayData[nextDay];
-    const pct=Math.round(((dd[last]||0)/dd.total)*100);
-    reasons.push(`${dowName} hit rate for ${last.toUpperCase()}: ${pct}% (${dd.total} samples)`);
-  }
-  reasons.push(`alternation rate: ${altPct}% (${altRate>0.55?'index alternates often':'index tends to streak'})`);
-
-  return {recommend, confidence, score, reasons, last, streak};
+// ─── SIGNALS ───
+function setIdx(idx, btn, group) {
+  activeIdx = idx;
+  document.querySelectorAll('.itabs .itab').forEach(t => {
+    if(t.closest('.card')===btn.closest('.card')) t.classList.remove('active');
+  });
+  btn.classList.add('active');
+  if(group==='sig') renderSignals();
+  else if(group==='pat') renderPatterns();
+  else if(group==='bt') renderBacktest();
 }
 
-// ─── RENDER BET SUGGESTION ───
-function renderBetSuggestion(){
-  const data=DB[activeIdx];
-  const el=document.getElementById('bet-suggestions');
-  if(!data||data.length<10){el.innerHTML='<p style="color:var(--t2);font-size:12px;">No data — fetch first</p>';return;}
+function renderSignals() {
+  const data = DB[activeIdx];
+  if(!data||!data.length){
+    document.getElementById('bet-suggestions').innerHTML='<p style="color:var(--t2);font-size:12px;">No data — go to ⚡ Fetch Data first</p>';
+    return;
+  }
+  const p = analysePatterns(data);
+  const sugOE = getBetSug(p,'oe');
+  const sugHL = getBetSug(p,'hilo');
+  lastSuggestions = {idx:activeIdx, sugOE, sugHL, date:today(), lastClose:p.last.close, lastDate:p.last.date};
 
-  const p=analysePatterns(data);
-  const sugOE=getBetSuggestion(p,'oe');
-  const sugHilo=getBetSuggestion(p,'hilo');
+  const confLabel = {strong:'🟢 Strong signal',moderate:'🟡 Moderate signal',weak:'⚪ No clear edge'};
+  const pickLabel = r => r?{odd:'BET ODD',even:'BET EVEN',hi:'BET OVER 4.5',lo:'BET UNDER 4.5'}[r]:'SKIP';
 
-  const confClass={strong:'bet-strong',moderate:'bet-moderate',weak:'bet-weak'};
-  const confLabel={strong:'Strong signal',moderate:'Moderate signal',weak:'No clear signal'};
-  const confColor={strong:'#2E6B0F',moderate:'#7A4800',weak:'#4A3FAF'};
-
-  const oeLabel = sugOE.recommend
-    ? (sugOE.recommend==='odd'?'BET ODD':'BET EVEN')
-    : 'NO EDGE — SKIP';
-  const hiloLabel = sugHilo.recommend
-    ? (sugHilo.recommend==='hi'?'BET OVER 4.5':'BET UNDER 4.5')
-    : 'NO EDGE — SKIP';
-
-  el.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="bet-box ${confClass[sugOE.confidence]}">
-        <div class="bet-label" style="color:${confColor[sugOE.confidence]}">${confLabel[sugOE.confidence]} · Signal 1</div>
-        <div class="bet-signal">${oeLabel}</div>
-        <div class="bet-reason">
-          ${sugOE.reasons.map(r=>`· ${r}`).join('<br>')}
-          <br>· Score: ${(sugOE.score*100).toFixed(0)}/100 toward ${sugOE.last.toUpperCase()}
-        </div>
+  document.getElementById('bet-suggestions').innerHTML=`
+    <div class="sig-grid">
+      <div class="sig-box ${sugOE.conf}">
+        <div class="sig-label">${confLabel[sugOE.conf]} · Odd/Even</div>
+        <div class="sig-pick">${pickLabel(sugOE.rec)}</div>
+        <div class="sig-reasons">${sugOE.reasons.map(r=>'· '+r).join('<br>')}
+        <br>· Score: ${(sugOE.score*100).toFixed(0)}/100</div>
       </div>
-      <div class="bet-box ${confClass[sugHilo.confidence]}">
-        <div class="bet-label" style="color:${confColor[sugHilo.confidence]}">${confLabel[sugHilo.confidence]} · Signal 2</div>
-        <div class="bet-signal">${hiloLabel}</div>
-        <div class="bet-reason">
-          ${sugHilo.reasons.map(r=>`· ${r}`).join('<br>')}
-          <br>· Score: ${(sugHilo.score*100).toFixed(0)}/100 toward ${sugHilo.last.toUpperCase()}
-        </div>
+      <div class="sig-box ${sugHL.conf}">
+        <div class="sig-label">${confLabel[sugHL.conf]} · Last digit &gt;4.5</div>
+        <div class="sig-pick">${pickLabel(sugHL.rec)}</div>
+        <div class="sig-reasons">${sugHL.reasons.map(r=>'· '+r).join('<br>')}
+        <br>· Score: ${(sugHL.score*100).toFixed(0)}/100</div>
       </div>
-    </div>
-    <p class="note" style="margin-top:8px;">Based on last ${p.n} trading days of ${LABELS[activeIdx]}. Last close: ${p.lastSignal.close.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})} on ${p.lastSignal.date} · Digit: ${p.lastSignal.digit} (${p.lastSignal.oe.toUpperCase()}, ${p.lastSignal.hilo==='hi'?'OVER':'UNDER'} 4.5). House edge at 1.93 odds: −3.5% — only bet when signal is strong.</p>
-  `;
+    </div>`;
+
+  const ls = p.last;
+  document.getElementById('last-close-card').style.display = 'block';
+  document.getElementById('last-close-info').innerHTML=
+    `<strong>${LABELS[activeIdx]}</strong> · ${p.n} trading days loaded<br>
+     Last close: <strong>${ls.close.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</strong> on ${ls.date}<br>
+     Floor: ${Math.floor(ls.close)} · Last digit: <strong>${ls.digit}</strong> · 
+     ${ls.oe.toUpperCase()} · ${ls.hilo==='hi'?'OVER':'UNDER'} 4.5<br>
+     <span style="color:var(--t3);">House edge at 1.93 odds: −3.5% per bet — only bet on strong signals</span>`;
 }
 
-// ─── RENDER PATTERNS ───
-function renderPatterns(){
-  const data=DB[activeIdx];
-  if(!data||data.length<10) return;
+// ─── LOG BETS ───
+async function logSuggestedBets() {
+  if(!lastSuggestions){document.getElementById('log-msg').textContent='No signals — fetch data first';return;}
+  const stake = parseFloat(document.getElementById('log-stake').value)||10;
+  const odds  = parseFloat(document.getElementById('log-odds').value)||1.93;
+  const {idx,sugOE,sugHL,date} = lastSuggestions;
+  const journal = await loadJournal();
+  let count = 0;
+  for(const sug of [sugOE,sugHL]) {
+    if(!sug.rec) continue;
+    journal.push({id:Date.now()+Math.random(),idx,date,signal:sug.signal,pick:sug.rec,stake,odds,
+      confidence:sug.conf,score:+(sug.score*100).toFixed(0),factors:sug.factors,
+      result:'pending',actualClose:null,pnl:null,loggedAt:new Date().toISOString()});
+    count++;
+  }
+  await saveJournal(journal);
+  document.getElementById('log-msg').textContent = `✓ Logged ${count} bets for ${date} — saved to Cloudflare KV`;
+  setTimeout(()=>document.getElementById('log-msg').textContent='',4000);
+}
+
+async function logBet() {
+  const journal = await loadJournal();
+  journal.push({id:Date.now(),idx:document.getElementById('j-idx').value,
+    date:document.getElementById('j-date').value,signal:document.getElementById('j-sig').value,
+    pick:document.getElementById('j-pick').value,stake:parseFloat(document.getElementById('j-stake').value)||10,
+    odds:parseFloat(document.getElementById('j-odds').value)||1.93,
+    confidence:document.getElementById('j-conf').value,score:null,factors:null,
+    result:'pending',actualClose:null,pnl:null,loggedAt:new Date().toISOString()});
+  await saveJournal(journal);
+  renderJournal();
+}
+
+async function settleBets() {
+  const idx   = document.getElementById('s-idx').value;
+  const date  = document.getElementById('s-date').value;
+  const close = parseFloat(document.getElementById('s-close').value);
+  const msg   = document.getElementById('s-msg');
+  if(!date||isNaN(close)){msg.textContent='Enter date and close';return;}
+  const s = sig(close);
+  const journal = await loadJournal();
+  let settled = 0;
+  journal.forEach(b => {
+    if(b.idx===idx&&b.date===date&&b.result==='pending'){
+      const won = b.signal==='oe'?b.pick===s.oe:b.pick===s.hilo;
+      b.result = won?'won':'lost';
+      b.actualClose = close;
+      b.pnl = pnl(won,b.stake,b.odds);
+      settled++;
+    }
+  });
+  await saveJournal(journal);
+  msg.textContent = `✓ Settled ${settled} bets · ${date} close: ${close} · digit: ${s.digit} (${s.oe.toUpperCase()}, ${s.hilo==='hi'?'OVER':'UNDER'} 4.5)`;
+  if(!DB[idx].find(d=>d.date===date)){DB[idx].push({date,close});DB[idx].sort((a,b)=>a.date.localeCompare(b.date));}
+  renderJournal();
+  autoTuneWeights(journal);
+}
+
+async function clearJournal(){if(confirm('Clear all bets from Cloudflare KV?')){await saveJournal([]);renderJournal();}}
+
+// ─── RENDER JOURNAL ───
+async function renderJournal() {
+  const filter = document.getElementById('j-filter').value;
+  let journal = await loadJournal();
+  const all = journal.length;
+  if(filter!=='all') journal=journal.filter(b=>filter==='strong'?b.confidence==='strong':b.result===filter);
+  journal = journal.slice().reverse();
+
+  const settled=journal.filter(b=>b.result!=='pending');
+  const won=settled.filter(b=>b.result==='won');
+  const totalPnl=settled.reduce((s,b)=>s+(b.pnl||0),0);
+  const staked=settled.reduce((s,b)=>s+b.stake,0);
+  document.getElementById('journal-count').textContent=`${all} total`;
+  document.getElementById('j-stats').innerHTML=
+    `Showing ${journal.length} · Settled: ${settled.length} · Won: ${won.length} (${settled.length?Math.round(won.length/settled.length*100):0}%) · P&L: <strong class="${totalPnl>=0?'win':'loss'}">${totalPnl>=0?'+':''}${totalPnl.toFixed(0)}</strong> · ROI: <strong class="${totalPnl>=0?'win':'loss'}">${staked?((totalPnl/staked)*100).toFixed(1):0}%</strong> · Stored in Cloudflare KV ☁`;
+
+  const cols='80px 55px 60px 68px 50px 55px 65px 60px 65px';
+  document.getElementById('j-thead').style.gridTemplateColumns=cols;
+  document.getElementById('j-thead').innerHTML='<span>Date</span><span>Idx</span><span>Signal</span><span>Pick</span><span>Stake</span><span>Odds</span><span>Conf</span><span>Result</span><span>P&L</span>';
+  document.getElementById('j-tbody').innerHTML=journal.map(b=>`
+    <div class="jrow" style="grid-template-columns:${cols};">
+      <span style="color:var(--t2);">${b.date}</span>
+      <span style="color:var(--t2);">${(b.idx||'').toUpperCase()}</span>
+      <span style="color:var(--t2);">${b.signal==='oe'?'Odd/Even':'Hi/Lo'}</span>
+      <span class="pill pill-${b.pick}">${b.pick.toUpperCase()}</span>
+      <span>${b.stake}</span>
+      <span>${b.odds}</span>
+      <span class="pill pill-${b.confidence}">${b.confidence}</span>
+      <span class="pill pill-${b.result}">${b.result}</span>
+      <span class="${b.pnl!=null?(b.pnl>=0?'win':'loss'):''}">${b.pnl!=null?(b.pnl>=0?'+':'')+b.pnl.toFixed(1):'—'}</span>
+    </div>`).join('');
+}
+
+// ─── MODEL ───
+async function autoTuneWeights(journal) {
+  if(!journal) journal = await loadJournal();
+  const settled=journal.filter(b=>b.result!=='pending'&&b.factors);
+  if(settled.length<20) return;
+  const fc={baseFreq:0,streakFollow:0,dayOfWeek:0,altRate:0};
+  const cn={baseFreq:0,streakFollow:0,dayOfWeek:0,altRate:0};
+  settled.forEach(b=>{
+    const c=b.result==='won'?1:0;
+    Object.keys(b.factors||{}).forEach(k=>{
+      if(b.factors[k]!==undefined){fc[k]+=(b.factors[k]-0.5)*(c-0.5)*4;cn[k]++;}
+    });
+  });
+  const raw={};
+  Object.keys(fc).forEach(k=>{raw[k]=Math.max(0.05,cn[k]>5?0.25+fc[k]/cn[k]*0.5:0.25);});
+  const total=Object.values(raw).reduce((s,v)=>s+v,0);
+  const weights={};
+  Object.keys(raw).forEach(k=>weights[k]=+(raw[k]/total).toFixed(3));
+  await saveWeights(weights);
+}
+
+async function renderModel() {
+  const journal = await loadJournal();
+  const W = await loadWeights();
+  const settled=journal.filter(b=>b.result!=='pending');
+  const won=settled.filter(b=>b.result==='won');
+  const totalPnl=settled.reduce((s,b)=>s+(b.pnl||0),0);
+  const staked=settled.reduce((s,b)=>s+b.stake,0);
+  const roi=staked?(totalPnl/staked*100):0;
+  const wr=settled.length?(won.length/settled.length*100):0;
+
+  document.getElementById('model-overview').innerHTML=`
+    <div class="metric"><div class="metric-l">Total bets</div><div class="metric-v">${settled.length}</div></div>
+    <div class="metric"><div class="metric-l">Win rate</div><div class="metric-v" style="color:${wr>=50?'var(--green)':'var(--red)'}">${wr.toFixed(1)}%</div></div>
+    <div class="metric"><div class="metric-l">Total P&L</div><div class="metric-v ${totalPnl>=0?'win':'loss'}">${totalPnl>=0?'+':''}${totalPnl.toFixed(0)}</div></div>
+    <div class="metric"><div class="metric-l">ROI</div><div class="metric-v ${roi>=0?'win':'loss'}">${roi>=0?'+':''}${roi.toFixed(1)}%</div></div>`;
+
+  const byConf={strong:{w:0,l:0,pnl:0},moderate:{w:0,l:0,pnl:0},weak:{w:0,l:0,pnl:0}};
+  const bySig={oe:{w:0,l:0,pnl:0},hilo:{w:0,l:0,pnl:0}};
+  settled.forEach(b=>{
+    const ck=b.confidence||'weak'; if(byConf[ck]){if(b.result==='won')byConf[ck].w++;else byConf[ck].l++;byConf[ck].pnl+=(b.pnl||0);}
+    const sk=b.signal||'oe'; if(bySig[sk]){if(b.result==='won')bySig[sk].w++;else bySig[sk].l++;bySig[sk].pnl+=(b.pnl||0);}
+  });
+
+  const mkCard=(label,v)=>{const t=v.w+v.l;if(!t)return`<div class="perf-card"><div class="perf-label">${label}</div><div class="perf-sub">No data yet</div></div>`;
+    const wr=v.w/t*100,s2=settled.filter(b=>b.confidence===label.toLowerCase()||b.signal===label).reduce((s,b)=>s+b.stake,0);
+    return`<div class="perf-card"><div class="perf-label">${label}</div><div class="perf-val" style="color:${wr>=50?'var(--green)':'var(--red)'}">${wr.toFixed(1)}%</div><div class="perf-sub">${t} bets · P&L: <span class="${v.pnl>=0?'win':'loss'}">${v.pnl>=0?'+':''}${v.pnl.toFixed(0)}</span></div></div>`;};
+  document.getElementById('model-by-conf').innerHTML=Object.entries(byConf).map(([k,v])=>mkCard(k,v)).join('');
+  document.getElementById('model-by-signal').innerHTML=[['Odd/Even',bySig.oe],['Hi/Lo',bySig.hilo]].map(([l,v])=>mkCard(l,v)).join('');
+
+  const wLabels={baseFreq:'Base frequency',streakFollow:'Streak tendency',dayOfWeek:'Day-of-week bias',altRate:'Alternation rate'};
+  document.getElementById('model-weights').innerHTML=Object.entries(W).map(([k,v])=>`
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span style="color:var(--t2);">${wLabels[k]||k}</span>
+        <strong>${(v*100).toFixed(0)}%</strong>
+      </div>
+      <div class="model-bar"><div class="model-fill" style="width:${v*100}%;background:${v>0.3?'var(--green)':v<0.15?'var(--red)':'var(--blue)'}"></div></div>
+    </div>`).join('');
+
+  const strongBets=settled.filter(b=>b.confidence==='strong');
+  const strongWR=strongBets.length?(strongBets.filter(b=>b.result==='won').length/strongBets.length*100):null;
+  const assess=settled.length<10
+    ? '<p style="font-size:12px;color:var(--t2);">Log at least 10 settled bets for model evaluation.</p>'
+    : [
+        strongWR!==null&&strongWR>55?`✅ <strong>Strong signals working</strong> — ${strongWR.toFixed(0)}% win rate. Bet at full stake.`:
+        strongWR!==null&&strongWR<45?`⚠️ <strong>Strong signals struggling</strong> — only ${strongWR.toFixed(0)}% win rate. Reduce stake or pause.`:'',
+        roi>0?`✅ <strong>Model profitable</strong> — ROI +${roi.toFixed(1)}%`:
+              `⚠️ <strong>Model in loss</strong> — ROI ${roi.toFixed(1)}%. Need >52% win rate at 1.93 odds.`,
+        settled.length>=20?`ℹ️ <strong>Weights auto-adjusted</strong> from ${settled.length} real bets via Cloudflare KV`:
+                           `ℹ️ ${settled.length}/20 bets logged — weights will auto-adjust at 20.`
+      ].filter(Boolean).map(r=>`<div style="font-size:12px;line-height:1.9;margin-bottom:6px;">${r}</div>`).join('');
+  document.getElementById('model-assessment').innerHTML=assess;
+}
+
+// ─── PATTERNS ───
+function renderPatterns() {
+  const data=DB[activeIdx]; if(!data||!data.length) return;
   const p=analysePatterns(data);
   const n=p.n;
-
-  // Metrics
-  const oddPct=Math.round(p.oeCount.odd/n*100);
-  const hiPct=Math.round(p.hiloCount.hi/n*100);
-  const altOEPct=Math.round(p.altRateOE*100);
-  const altHiloPct=Math.round(p.altRateHilo*100);
+  const op=Math.round(p.oeC.odd/n*100), hp=Math.round(p.hiloC.hi/n*100);
   document.getElementById('pat-metrics').innerHTML=`
-    <div class="metric"><div class="ml">ODD closes</div><div class="mv" style="color:#185FA5">${p.oeCount.odd} <span style="font-size:11px;color:var(--t2)">(${oddPct}%)</span></div></div>
-    <div class="metric"><div class="ml">EVEN closes</div><div class="mv" style="color:#2E6B0F">${p.oeCount.even} <span style="font-size:11px;color:var(--t2)">(${100-oddPct}%)</span></div></div>
-    <div class="metric"><div class="ml">Digit &gt;4.5</div><div class="mv" style="color:#7A4800">${p.hiloCount.hi} <span style="font-size:11px;color:var(--t2)">(${hiPct}%)</span></div></div>
-    <div class="metric"><div class="ml">Alternation rate</div><div class="mv" style="color:#4A3FAF">${altOEPct}% <span style="font-size:11px;color:var(--t2)">OE / ${altHiloPct}% Hi</span></div></div>
-  `;
+    <div class="metric"><div class="metric-l">ODD closes</div><div class="metric-v" style="color:var(--blue)">${p.oeC.odd} <span style="font-size:11px;color:var(--t2)">(${op}%)</span></div></div>
+    <div class="metric"><div class="metric-l">EVEN closes</div><div class="metric-v" style="color:var(--green)">${p.oeC.even} <span style="font-size:11px;color:var(--t2)">(${100-op}%)</span></div></div>
+    <div class="metric"><div class="metric-l">Digit &gt;4.5</div><div class="metric-v" style="color:var(--amber)">${p.hiloC.hi} <span style="font-size:11px;color:var(--t2)">(${hp}%)</span></div></div>
+    <div class="metric"><div class="metric-l">Alt rate OE/Hi</div><div class="metric-v" style="color:var(--purple)">${Math.round(p.arOE*100)}%<span style="font-size:13px;">/${Math.round(p.arHL*100)}%</span></div></div>`;
 
-  // Day-of-week OE
   document.getElementById('dow-oe').innerHTML=DAYS.map((_,i)=>{
-    const d=i+1;
-    const dd=p.dowOE[d];
-    if(!dd||dd.total===0) return `<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div class="dow-val" style="color:var(--t3)">—</div></div>`;
-    const oddPct=Math.round(dd.odd/dd.total*100);
-    const bias=oddPct>55?'#185FA5':oddPct<45?'#2E6B0F':'#6b6b68';
-    const label=oddPct>55?'ODD':'EVEN';
-    return `<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div class="dow-val" style="color:${bias}">${label}</div><div class="dow-sub">${oddPct}% odd · ${dd.total}d</div></div>`;
+    const d=i+1,dd=p.dOE[d]; if(!dd||!dd.total)return`<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div style="color:var(--t3);">—</div></div>`;
+    const op2=Math.round(dd.odd/dd.total*100),col=op2>55?'var(--blue)':op2<45?'var(--green)':'var(--t2)';
+    return`<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div class="dow-val" style="color:${col}">${op2>55?'ODD':'EVEN'}</div><div class="dow-sub">${op2}% · ${dd.total}d</div></div>`;
   }).join('');
 
-  // Day-of-week HiLo
   document.getElementById('dow-hilo').innerHTML=DAYS.map((_,i)=>{
-    const d=i+1;
-    const dd=p.dowHilo[d];
-    if(!dd||dd.total===0) return `<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div class="dow-val" style="color:var(--t3)">—</div></div>`;
-    const hiPct=Math.round(dd.hi/dd.total*100);
-    const bias=hiPct>55?'#7A4800':hiPct<45?'#4A3FAF':'#6b6b68';
-    const label=hiPct>55?'OVER':'UNDER';
-    return `<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div class="dow-val" style="color:${bias}">${label}</div><div class="dow-sub">${hiPct}% over · ${dd.total}d</div></div>`;
+    const d=i+1,dd=p.dHL[d]; if(!dd||!dd.total)return`<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div style="color:var(--t3);">—</div></div>`;
+    const hp2=Math.round(dd.hi/dd.total*100),col=hp2>55?'var(--amber)':hp2<45?'var(--purple)':'var(--t2)';
+    return`<div class="dow-cell"><div class="dow-name">${DAYS[i]}</div><div class="dow-val" style="color:${col}">${hp2>55?'OVER':'UNDER'}</div><div class="dow-sub">${hp2}% · ${dd.total}d</div></div>`;
   }).join('');
 
-  // Streak follow analysis
-  const sfHTML=['oe','hilo'].map(sig=>{
-    const sf=sig==='oe'?p.streakFollowOE:p.streakFollowHilo;
-    const label=sig==='oe'?'Odd/Even':'Hi/Lo';
-    return `<div style="margin-bottom:8px;"><span style="font-size:11px;color:var(--t2);font-weight:600;">${label}:</span> `+
-      [1,2,3].map(len=>{
-        const s=sf[len];
-        const total=s.same+s.diff;
-        if(total<3) return `<span style="font-size:11px;color:var(--t3);">after ${len}: insufficient data</span>`;
-        const contPct=Math.round(s.same/total*100);
-        const col=contPct>58?'#2E6B0F':contPct<42?'#A32D2D':'#6b6b68';
-        const label2=contPct>58?'continues':'reverses';
-        return `<span style="font-size:11px;margin-right:12px;"><strong style="color:${col}">After ${len}×: ${label2} ${contPct>58?contPct:100-contPct}%</strong> (${total} cases)</span>`;
-      }).join('') + '</div>';
+  document.getElementById('streak-analysis').innerHTML=['oe','hilo'].map(sig=>{
+    const sf=sig==='oe'?p.sfOE:p.sfHL;
+    return`<div style="margin-bottom:8px;font-size:11px;"><strong style="color:var(--t2);">${sig==='oe'?'Odd/Even':'Hi/Lo'}:</strong> `+
+      [1,2,3].map(len=>{const s=sf[len],t=s.same+s.diff;if(t<3)return`<span style="color:var(--t3)">after ${len}×: n/a</span>`;
+        const cp=Math.round(s.same/t*100),col=cp>58?'var(--green)':cp<42?'var(--red)':'var(--t2)';
+        return`<span style="margin-right:12px;"><strong style="color:${col}">after ${len}×: ${cp>58?'continues':'reverses'} ${cp>58?cp:100-cp}%</strong> (${t})</span>`;}).join('')+'</div>';
   }).join('');
-  document.getElementById('streak-analysis').innerHTML=sfHTML;
 
-  // Digit heatmap
-  const maxD=Math.max(...p.digitCount);
-  document.getElementById('digit-heatmap').innerHTML=p.digitCount.map((cnt,d)=>{
-    const pct=Math.round(cnt/n*100);
-    const intensity=maxD>0?cnt/maxD:0;
-    const bg=`rgba(24,95,165,${0.1+intensity*0.7})`;
-    const col=intensity>0.5?'#fff':'#1a1a18';
-    return `<div class="hm-cell" style="background:${bg};color:${col};">${d}<br><span style="font-size:9px;">${pct}%</span></div>`;
+  const maxD=Math.max(...p.digC);
+  document.getElementById('digit-heatmap').innerHTML=p.digC.map((cnt,d)=>{
+    const pct=Math.round(cnt/n*100),intensity=maxD>0?cnt/maxD:0;
+    const alpha=0.15+intensity*0.7,col=intensity>0.55?'#fff':intensity>0.3?'var(--text)':'var(--t2)';
+    return`<div class="hm-cell" style="background:rgba(79,142,247,${alpha});color:${col};">${d}<br><span style="font-size:9px;">${pct}%</span></div>`;
   }).join('');
 }
 
-// ─── RENDER BACKTEST ───
-function renderBacktest(){
-  const data=DB[activeIdx];
-  if(!data||!data.length) return;
-  const s1v=document.getElementById('s1').value;
-  const s2v=document.getElementById('s2').value;
-  const stake=parseFloat(document.getElementById('stake').value)||10;
-  const odds=parseFloat(document.getElementById('odds').value)||1.93;
+// ─── BACKTEST ───
+function renderBacktest() {
+  const data=DB[activeIdx]; if(!data||!data.length){document.getElementById('bt-info').textContent='No data — fetch first';return;}
+  const s1v=document.getElementById('s1').value,s2v=document.getElementById('s2').value;
+  const stake=parseFloat(document.getElementById('bt-stake').value)||10;
+  const odds=parseFloat(document.getElementById('bt-odds').value)||1.93;
   const color=COLORS[activeIdx],n=data.length;
   let s1w=0,s1l=0,s1p=0,s2w=0,s2l=0,s2p=0;
   const c1=[0],c2=[0],lbls=['Start'];
@@ -519,49 +797,40 @@ function renderBacktest(){
     const s=sig(d.close),w1=s.oe===s1v,w2=s.hilo===s2v;
     const p1=pnl(w1,stake,odds),p2=pnl(w2,stake,odds);
     s1p+=p1;s2p+=p2;w1?s1w++:s1l++;w2?s2w++:s2l++;
-    c1.push(+s1p.toFixed(2));c2.push(+s2p.toFixed(2));
-    lbls.push(d.date.slice(5));
+    c1.push(+s1p.toFixed(2));c2.push(+s2p.toFixed(2));lbls.push(d.date.slice(5));
   });
-  const roe1=((s1p/(stake*n))*100).toFixed(1),roe2=((s2p/(stake*n))*100).toFixed(1);
-  const he=(((odds-1)*0.5-0.5)*100).toFixed(2);
   const last=data[data.length-1],ls=sig(last.close);
-  document.getElementById('idx-info').textContent=`${LABELS[activeIdx]} · ${n} days · Latest: ${last.close.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})} on ${last.date} · Digit: ${ls.digit} (${ls.oe.toUpperCase()}, ${ls.hilo==='hi'?'OVER':'UNDER'} 4.5)`;
-  document.getElementById('s1stats').innerHTML=`<strong>${s1w}W/${s1l}L</strong> · ${((s1w/n)*100).toFixed(1)}% · P&L: <strong class="${s1p>=0?'win':'loss'}">${s1p>=0?'+':''}${s1p.toFixed(0)}</strong> · ROI: <span class="${s1p>=0?'win':'loss'}">${roe1}%</span>`;
-  document.getElementById('s2stats').innerHTML=`<strong>${s2w}W/${s2l}L</strong> · ${((s2w/n)*100).toFixed(1)}% · P&L: <strong class="${s2p>=0?'win':'loss'}">${s2p>=0?'+':''}${s2p.toFixed(0)}</strong> · ROI: <span class="${s2p>=0?'win':'loss'}">${roe2}%</span>`;
+  document.getElementById('bt-info').textContent=`${LABELS[activeIdx]} · ${n} days · Last: ${last.close.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})} on ${last.date} · Digit: ${ls.digit}`;
+  document.getElementById('s1stats').innerHTML=`<strong>${s1w}W/${s1l}L</strong> · ${((s1w/n)*100).toFixed(1)}% · P&L: <strong class="${s1p>=0?'win':'loss'}">${s1p>=0?'+':''}${s1p.toFixed(0)}</strong> · ROI: <span class="${s1p>=0?'win':'loss'}">${((s1p/(stake*n))*100).toFixed(1)}%</span>`;
+  document.getElementById('s2stats').innerHTML=`<strong>${s2w}W/${s2l}L</strong> · ${((s2w/n)*100).toFixed(1)}% · P&L: <strong class="${s2p>=0?'win':'loss'}">${s2p>=0?'+':''}${s2p.toFixed(0)}</strong> · ROI: <span class="${s2p>=0?'win':'loss'}">${((s2p/(stake*n))*100).toFixed(1)}%</span>`;
   const tp=s1p+s2p,ts=stake*n*2;
-  document.getElementById('comb').innerHTML=`<strong>${LABELS[activeIdx]}</strong> · ${n} days · Staked: <strong>${ts.toFixed(0)}</strong> · P&L: <strong class="${tp>=0?'win':'loss'}">${tp>=0?'+':''}${tp.toFixed(0)}</strong> · ROI: <strong class="${tp>=0?'win':'loss'}">${((tp/ts)*100).toFixed(1)}%</strong> · House edge: <strong class="loss">${he}%</strong>`;
-  const co=(col,dat)=>({type:'line',data:{labels:lbls,datasets:[{data:dat,borderColor:col,borderWidth:1.5,pointRadius:0,fill:{target:'origin',above:col+'28',below:'rgba(163,45,45,0.12)'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{font:{size:9},callback:v=>(v>=0?'+':'')+v.toFixed(0)},grid:{color:'rgba(128,128,128,0.07)'}}}}});
+  document.getElementById('bt-comb').innerHTML=`<strong>${LABELS[activeIdx]}</strong> · ${n} days · Staked: <strong>${ts.toFixed(0)}</strong> · P&L: <strong class="${tp>=0?'win':'loss'}">${tp>=0?'+':''}${tp.toFixed(0)}</strong> · ROI: <strong class="${tp>=0?'win':'loss'}">${((tp/ts)*100).toFixed(1)}%</strong> · House edge: <strong class="loss">${(((odds-1)*0.5-0.5)*100).toFixed(2)}%</strong>`;
+  const co=(col,dat)=>({type:'line',data:{labels:lbls,datasets:[{data:dat,borderColor:col,borderWidth:1.5,pointRadius:0,fill:{target:'origin',above:col+'20',below:'rgba(247,90,90,0.1)'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{font:{size:9},color:'#55555c',callback:v=>(v>=0?'+':'')+v.toFixed(0)},grid:{color:'rgba(255,255,255,0.04)'}}}}});
   if(ch1)ch1.destroy();if(ch2)ch2.destroy();
-  ch1=new Chart(document.getElementById('c1'),co(color,c1));
-  ch2=new Chart(document.getElementById('c2'),co(color,c2));
-  const cols='90px 95px 34px 60px 58px 65px 65px';
-  document.getElementById('thead').style.gridTemplateColumns=cols;
-  document.getElementById('thead').innerHTML='<span>Date</span><span>Close</span><span>Digit</span><span>Odd/Even</span><span>Hi/Lo</span><span>Sig1 P&L</span><span>Sig2 P&L</span>';
-  document.getElementById('tbody').innerHTML=[...data].reverse().map(d=>{
-    const s=sig(d.close),w1=s.oe===s1v,w2=s.hilo===s2v;
-    const p1=pnl(w1,stake,odds),p2=pnl(w2,stake,odds);
-    return `<div class="trow" style="grid-template-columns:${cols};"><span style="color:var(--t2);">${d.date}</span><span style="font-weight:700;">${d.close.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span style="font-weight:700;">${s.digit}</span><span class="pill p-${s.oe}">${s.oe.toUpperCase()}</span><span class="pill p-${s.hilo}">${s.hilo==='hi'?'OVER':'UNDER'}</span><span class="${w1?'win':'loss'}">${p1>=0?'+':''}${p1}</span><span class="${w2?'win':'loss'}">${p2>=0?'+':''}${p2}</span></div>`;
+  ch1=new Chart(document.getElementById('c1'),co(color,c1));ch2=new Chart(document.getElementById('c2'),co(color,c2));
+  const cols='90px 95px 32px 60px 58px 65px 65px';
+  document.getElementById('bt-thead').style.gridTemplateColumns=cols;
+  document.getElementById('bt-thead').innerHTML='<span>Date</span><span>Close</span><span>D</span><span>Odd/Even</span><span>Hi/Lo</span><span>Sig1</span><span>Sig2</span>';
+  document.getElementById('bt-tbody').innerHTML=[...data].reverse().map(d=>{
+    const s=sig(d.close),w1=s.oe===s1v,w2=s.hilo===s2v,p1=pnl(w1,stake,odds),p2=pnl(w2,stake,odds);
+    return`<div class="trow" style="grid-template-columns:${cols};"><span style="color:var(--t2);">${d.date}</span><span style="font-weight:700;">${d.close.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</span><span style="color:var(--t2);">${s.digit}</span><span class="pill pill-${s.oe}">${s.oe.toUpperCase()}</span><span class="pill pill-${s.hilo}">${s.hilo==='hi'?'OVER':'UNDER'}</span><span class="${w1?'win':'loss'}">${p1>=0?'+':''}${p1}</span><span class="${w2?'win':'loss'}">${p2>=0?'+':''}${p2}</span></div>`;
   }).join('');
-  document.getElementById('drange').textContent=`${data[0].date} to ${data[data.length-1].date} · Google Finance`;
 }
 
-function manualAdd(){
-  const idx=document.getElementById('m-idx').value;
-  const date=document.getElementById('m-date').value.trim();
-  const close=parseFloat(document.getElementById('m-close').value);
-  const msg=document.getElementById('m-msg');
+function manualAdd() {
+  const idx=document.getElementById('m-idx').value,date=document.getElementById('m-date').value.trim();
+  const close=parseFloat(document.getElementById('m-close').value),msg=document.getElementById('m-msg');
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){msg.textContent='Use YYYY-MM-DD';return;}
   if(isNaN(close)||close<MIN_C[idx]){msg.textContent='Invalid close';return;}
   if(DB[idx].find(d=>d.date===date)){msg.textContent='Already exists';return;}
-  DB[idx].push({date,close});
-  DB[idx].sort((a,b)=>a.date.localeCompare(b.date));
-  msg.textContent=`✓ Added — refresh patterns`;
-  document.getElementById('m-date').value='';
-  document.getElementById('m-close').value='';
-  if(activeIdx===idx){renderBetSuggestion();renderPatterns();renderBacktest();}
+  DB[idx].push({date,close});DB[idx].sort((a,b)=>a.date.localeCompare(b.date));
+  msg.textContent=`✓ Added`;
+  document.getElementById('m-date').value='';document.getElementById('m-close').value='';
+  if(currentPage==='signals')renderSignals();if(currentPage==='backtest')renderBacktest();
 }
 
 checkWorker();
+showPage('signals',document.querySelector('.nav-item'));
 </script>
 </body>
 </html>
