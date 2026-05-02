@@ -1,4 +1,3 @@
 name = "massive-proxy"
 main = "index.js"
 compatibility_date = "2024-01-01"
-account_id = "0b850ec1d3858f7601ca36b08bf207ff"
